@@ -4,13 +4,16 @@ const mongoose = require("mongoose");
 const Listing = require("./models/listing.js")
 const path = require("path");
 const methodOverride = require("method-override");
-// Database connectes
+engine = require('ejs-mate'),
+    // Database connectes
 
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+    app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.engine("ejs", engine);
+app.use(express.static(path.join(__dirname, "/public")));
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/test";
 
