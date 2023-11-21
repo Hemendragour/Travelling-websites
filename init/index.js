@@ -22,7 +22,7 @@ const initDB = async () => {
     // await Listing.insertMany(initData.data);
     try {
         await Listing.collection.insertMany(initData.data);
-        console.log('Inserted ten rogues in collection');
+         console.log('Inserted ten rogues in collection');
     } catch (err) {
         console.error(err);
     }
