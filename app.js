@@ -4,7 +4,13 @@ const mongoose = require("mongoose");
 const Listing = require("./models/listing.js")
 const path = require("path");
 const methodOverride = require("method-override");
+const passport = require("passport")
+const LocalStrategy = require("passport-local")
+const User = require("./models/user.js")
+const session = require("express-session")
+const userRouter = require("./routes/user.js")
 engine = require('ejs-mate'),
+
     // Database connectes
 
 
@@ -14,6 +20,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", engine);
 app.use(express.static(path.join(__dirname, "/public")));
+
+
+const sessionOptions = {
+    secret: "mysupersecretstring",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+    }
+}
+
+app.use(session(sessionOptions));
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/test";
 
@@ -54,7 +74,26 @@ app.post("/listings", async (req, res) => {
 
 
 
+app.use(session(sessionOptions));
+// app.use(flash());
 
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.get("/demouser", async (req, res) => {
+    let fakeUser = new User({
+        email: "student@gmail.com",
+        username: "delta-student"
+    })
+    let register = await User.register(fakeUser, "helloworld")
+    res.send(registerUser)
+})
+
+app.use("/", userRouter)
 
 //Show Route
 app.get("/listings/:id", async (req, res) => {
